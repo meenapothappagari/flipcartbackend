@@ -1,11 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors")
 
 const app = express();
 const PORT = 3000;
+app.use(cors())
 
 // Replace with your MongoDB URI
-const MONGODB_URI ="mongodb+srv://meena:meena@cluster0.igx3gzr.mongodb.net/meena?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URI = "mongodb+srv://meena:meena@cluster0.igx3gzr.mongodb.net/meena?retryWrites=true&w=majority&appName=Cluster0";
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -14,7 +16,7 @@ mongoose.connect(MONGODB_URI, {
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
-  console.log("Connected to MongoDB"); 
+  console.log("Connected to MongoDB");
 });
 
 const flipkartSchema = new mongoose.Schema(
@@ -36,14 +38,14 @@ const flipkartSchema = new mongoose.Schema(
 const Flipkart = mongoose.model("flipcart", flipkartSchema);
 
 // Route to get data in chunks of 20
-app.get("/data", async (req, res) => {
+app.get("/data", cors(), async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 20;
   const skip = (page - 1) * limit;
 
   try {
     const data = await Flipkart.find().skip(skip).limit(limit);
-      res.json(data);
+    res.json(data);
   } catch (error) {
     res.status(500).json({ message: "Error fetching data", error });
   }
